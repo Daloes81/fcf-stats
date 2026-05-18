@@ -1,0 +1,15 @@
+{
+  "name": "fcf-stats",
+  "version": "1.0.0",
+  "description": "Estadístiques equips FCF.cat - qualsevol equip de qualsevol competició",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "cheerio": "^1.0.0",
+    "express": "^4.19.0"
+  }
+}
