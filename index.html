@@ -87,6 +87,56 @@ a.fl:hover{opacity:1}
 .cache-badge{margin-bottom:8px;font-size:11px;padding:6px 10px;background:rgba(45,122,58,.1);border:1px solid rgba(45,122,58,.25);border-radius:6px;color:#7ecb8a}
 .hidden{display:none!important}
 @media(max-width:520px){.t-rec{display:none}.kpis{grid-template-columns:repeat(3,1fr)}.exg{grid-template-columns:1fr}.hero h2{font-size:22px}}
+
+@media print {
+  @page { size: A4 portrait; margin: 8mm; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .hdr, .hero, .prog, .err, .exp-row, #historyPanel { display: none !important; }
+  .dash { display: block !important; padding: 0 !important; max-width: 100% !important; }
+  /* Header equip */
+  .t-hdr { border-bottom: 1px solid #ccc !important; padding-bottom: 6px !important; margin-bottom: 8px !important; }
+  .t-logo { width: 34px !important; height: 34px !important; }
+  .t-name { font-size: 13px !important; color: #000 !important; }
+  .t-sub { font-size: 8px !important; color: #555 !important; }
+  .t-rec-r { font-size: 13px !important; color: #000 !important; }
+  .t-rec-d { font-size: 8px !important; color: #555 !important; }
+  /* KPIs */
+  .kpis { gap: 3px !important; margin-bottom: 8px !important; }
+  .kpi { background: #f5f5f5 !important; border: 1px solid #ddd !important; padding: 4px 6px !important; border-radius: 3px !important; }
+  .kl { font-size: 7px !important; color: #666 !important; }
+  .kv { font-size: 14px !important; color: #000 !important; }
+  .ks { font-size: 7px !important; color: #888 !important; }
+  /* Taula — lletra petita per cabre en A4 vertical */
+  .tw { overflow: visible !important; }
+  table { width: 100% !important; border-collapse: collapse !important; font-size: 7.5px !important; table-layout: fixed !important; }
+  thead th { background: #f0f0f0 !important; color: #000 !important; border: 0.5px solid #ccc !important; padding: 3px 3px !important; font-size: 7px !important; white-space: nowrap !important; }
+  thead th.nl { min-width: auto !important; width: 28% !important; }
+  tbody td { border: 0.5px solid #e0e0e0 !important; padding: 2.5px 3px !important; color: #000 !important; background: #fff !important; }
+  tbody td.nm { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-size: 7.5px !important; }
+  tbody tr:nth-child(even) td { background: #f9f9f9 !important; }
+  tfoot td { background: #f0f0f0 !important; border: 0.5px solid #ccc !important; padding: 3px !important; color: #000 !important; font-size: 7.5px !important; }
+  /* Badges */
+  .b { border: 0.5px solid #bbb !important; color: #000 !important; background: #f5f5f5 !important; padding: 0 3px !important; border-radius: 2px !important; font-size: 7px !important; }
+  .bb { background: #ddeeff !important; border-color: #99bbdd !important; }
+  .bg { background: #ddeedd !important; border-color: #99bb99 !important; }
+  .ba { background: #fff3cc !important; border-color: #ddbb55 !important; }
+  .br { background: #ffdddd !important; border-color: #dd9999 !important; }
+  .bdg { background: #eedbff !important; border-color: #bb99dd !important; }
+  .mu { color: #bbb !important; font-size: 7px !important; }
+  .star { color: #c8960c !important; }
+  th.ct, td.ct { background: #e8f0ff !important; }
+  th.cy, td.cy { background: #fffbe0 !important; }
+  th.cr, td.cr { background: #ffe8e8 !important; }
+  th.cp, td.cp { background: #f2e8ff !important; }
+  /* Nota peu */
+  .nota { font-size: 7px !important; color: #666 !important; border-top: 0.5px solid #ccc !important; padding-top: 5px !important; margin-top: 5px !important; line-height: 1.4 !important; }
+  .nota strong { color: #333 !important; }
+  a.fl { display: none !important; }
+  /* Forçar tot en una sola pàgina */
+  .dash * { page-break-inside: avoid !important; }
+  table { page-break-inside: avoid !important; }
+}
 </style>
 </head>
 <body>
@@ -478,7 +528,7 @@ function renderDash(opts) {
     +'<div class="kpi"><div class="kl">Grogues</div><div class="kv">'+tGrg+'</div><div class="ks">acumulades</div></div>'
     +'<div class="kpi"><div class="kl">Vermelles</div><div class="kv">'+tVrm+'</div><div class="ks">directes</div></div>'
     +'<div class="kpi"><div class="kl">Top golejador</div><div class="kv">'+top.gols+'</div><div class="ks">'+(top.name?top.name.split(',')[0]:'—')+'</div></div></div>'
-    +'<div class="exp-row"><button class="btn-sm" onclick="window.print()">&#x1F5A8; Imprimir / PDF</button><button class="btn-sm" onclick="doCSV()">&#x1F4CB; Copiar CSV</button></div>'
+    +'<div class="exp-row"><button class="btn-sm" onclick="window.print()" title="Només imprimeix la fitxa (A4 apaisant)">&#x1F5A8; Imprimir / PDF</button><button class="btn-sm" onclick="doCSV()">&#x1F4CB; Copiar CSV</button></div>'
     +'<div class="tw"><table><thead><tr><th class="nl" style="min-width:170px">Jugador</th><th title="Convocats">Conv.</th><th class="ct" title="Titular">Tit.</th><th title="Suplent">Sup.</th><th title="Partits jugats">PJ</th><th>Gols</th><th title="Gols per partit">G/P</th><th class="cy" title="Grogues">&#x1F7E1; Grg.</th><th class="cr" title="Vermelles">&#x1F534; Verm.</th><th class="cp" title="Doble groga">2G</th><th style="width:32px">FCF</th></tr></thead>'
     +'<tbody>'+rows+'</tbody><tfoot><tr><td class="nm">TOTALS EQUIP</td><td colspan="4" style="font-size:10px;color:var(--text3)">—</td><td><span class="b bg">'+tGols+'</span></td><td style="font-weight:700">'+gpp+'</td><td class="cy"><span class="b ba">'+tGrg+'</span></td><td class="cr"><span class="b br">'+tVrm+'</span></td><td class="cp"><span class="b bdg">'+tDG+'</span></td><td></td></tr></tfoot></table></div>'
     +'<div class="nota"><strong>Fonts:</strong> Conv./Tit./Sup./PJ/Gols/G·P = fitxes individuals fcf.cat · Grogues/Vermelles/2G = recompte de les actes oficials fcf.cat.<br><strong>&#x2605;</strong> màxim golejador · G/P equip = '+tGols+'÷'+maxPJ+' = <strong>'+gpp+'</strong> · <strong>2G</strong> = doble groga al mateix partit</div>';
