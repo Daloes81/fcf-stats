@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCF Stats — Estadístiques d'equip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--border:#252a38;--text:#e8eaf0;--text2:#8a90a2;--text3:#4e5568;--accent:#e63946;--r:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+.hdr{border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;background:var(--bg2);position:sticky;top:0;z-index:10}
+.hdr-ico{width:30px;height:30px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hdr h1{font-size:15px;font-weight:700}.hdr p{font-size:11px;color:var(--text3);margin-top:1px}
+.hero{max-width:680px;margin:40px auto 0;padding:0 20px}
+.hero h2{font-size:26px;font-weight:700;line-height:1.2;letter-spacing:-.02em;margin-bottom:8px}
+.hero h2 span{color:var(--accent)}
+.hero p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.row{display:flex;gap:8px;margin-bottom:12px}
+.row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border-color .2s}
+.row input:focus{border-color:var(--accent)}
+.row input::placeholder{color:var(--text3)}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{background:#c0303a}.btn:disabled{opacity:.4;cursor:not-allowed}
+.sel-row{display:flex;gap:8px;margin-bottom:12px}
+.sel-row select{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;outline:none}
+.exg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ex{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:border-color .2s}
+.ex:hover{border-color:var(--accent)}
+.ex-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.ex-v{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
+.prog{max-width:680px;margin:20px auto;padding:0 20px}
+.prog-bar{height:3px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#e63946,#ff6b6b);border-radius:99px;transition:width .3s ease}
+.prog-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-family:'DM Mono',monospace;display:flex;gap:6px;align-items:center}
+.dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pu 1s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.err{max-width:680px;margin:16px auto;padding:0 20px}
+.err-inner{background:rgba(163,45,45,.1);border:1px solid rgba(163,45,45,.4);border-radius:var(--r);padding:14px 16px;font-size:12px;color:#f08080;line-height:1.7;white-space:pre-wrap}
+.dash{max-width:920px;margin:0 auto;padding:24px 20px 48px}
+.t-hdr{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.t-logo{width:52px;height:52px;object-fit:contain;flex-shrink:0;border-radius:6px}
+.t-logo-ph{width:52px;height:52px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.t-name{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.t-sub{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.5}
+.t-rec{margin-left:auto;text-align:right;flex-shrink:0}
+.t-rec-r{font-size:19px;font-weight:700;font-family:'DM Mono',monospace}
+.t-rec-d{font-size:10px;color:var(--text3);margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.kl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.kv{font-size:23px;font-weight:700;font-family:'DM Mono',monospace}
+.ks{font-size:10px;color:var(--text3);margin-top:1px}
+.tw{overflow-x:auto;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:660px}
+thead th{font-size:10px;font-weight:600;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border);background:var(--bg2);white-space:nowrap;text-align:center;text-transform:uppercase;letter-spacing:.04em}
+thead th.nl{text-align:left}
+tbody td{padding:6px 8px;border-bottom:1px solid rgba(37,42,56,.6);color:var(--text);text-align:center;vertical-align:middle}
+tbody td.nm{text-align:left;font-weight:500;font-size:12px;white-space:nowrap}
+tbody tr:hover td{background:rgba(255,255,255,.025)}
+tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+tfoot td{font-weight:700;border-top:1px solid var(--border);background:var(--bg2);padding:7px 8px;text-align:center}
+tfoot td.nm{text-align:left;font-size:11px;color:var(--text2);font-weight:400}
+.b{display:inline-block;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600}
+.bb{background:rgba(29,111,164,.13);color:#7dbee8;border:1px solid rgba(29,111,164,.25)}
+.bg{background:rgba(45,122,58,.13);color:#7ecb8a;border:1px solid rgba(45,122,58,.25)}
+.ba{background:rgba(184,124,18,.13);color:#e0b45a;border:1px solid rgba(184,124,18,.25)}
+.br{background:rgba(163,45,45,.13);color:#e08080;border:1px solid rgba(163,45,45,.25)}
+.bdg{background:rgba(83,52,137,.13);color:#c09ee8;border:1px solid rgba(83,52,137,.25)}
+.mu{color:var(--text3);font-size:12px}
+.star{color:#f0b429}
+th.ct,td.ct{background:rgba(29,111,164,.06)}
+th.cy,td.cy{background:rgba(184,124,18,.06)}
+th.cr,td.cr{background:rgba(163,45,45,.06)}
+th.cp,td.cp{background:rgba(83,52,137,.06)}
+.nota{font-size:11px;color:var(--text3);line-height:1.7;padding-top:10px;border-top:1px solid var(--border)}
+.nota strong{color:var(--text2)}
+a.fl{color:var(--accent);font-size:10px;text-decoration:none;opacity:.6}
+a.fl:hover{opacity:1}
+.exp-row{display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px}
+.btn-sm{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-sm:hover{border-color:var(--text2);color:var(--text)}
+.hitem{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:border-color .2s}
+.hitem:hover{border-color:var(--accent)}
+.cache-badge{margin-bottom:8px;font-size:11px;padding:6px 10px;background:rgba(45,122,58,.1);border:1px solid rgba(45,122,58,.25);border-radius:6px;color:#7ecb8a}
+.hidden{display:none!important}
+@media(max-width:520px){.t-rec{display:none}.kpis{grid-template-columns:repeat(3,1fr)}.exg{grid-template-columns:1fr}.hero h2{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-ico">&#x26BD;</div>
+  <div><h1>FCF Stats</h1><p>Estadístiques de plantilla &middot; fcf.cat</p></div>
+</header>
+
+<div class="hero">
+  <h2>Estadístiques de qualsevol equip de la <span>FCF</span></h2>
+  <p>Enganxa la URL de la pàgina de <strong>classificació</strong> de fcf.cat, selecciona l'equip i genera el dashboard.</p>
+
+  <div id="historyPanel" class="hidden" style="margin-bottom:16px">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;justify-content:space-between">
+      <span>&#x1F553; Cerques recents</span><span id="historyCount"></span>
+    </div>
+    <div id="historyList" style="display:flex;flex-direction:column;gap:4px"></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <input type="text" id="urlInput" placeholder="https://www.fcf.cat/classificacio/2526/futbol-11/infantil-primera-divisio-s13/grup-12"/>
+      <button class="btn" id="fetchBtn" onclick="onFetch()">Carregar</button>
+    </div>
+
+    <div id="selWrap" class="hidden" style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Selecciona l'equip</div>
+      <div class="sel-row">
+        <select id="teamSel"></select>
+        <button class="btn" id="genBtn" onclick="onGen()">Generar</button>
+      </div>
+    </div>
+
+    <div id="cacheBadge" class="cache-badge hidden">
+      &#x26A1; Dades en caché (24h) &middot;
+      <button onclick="doForceRefresh()" style="background:none;border:none;color:#7ecb8a;cursor:pointer;text-decoration:underline;font-size:11px;padding:0">Actualitzar</button>
+    </div>
+
+    <div class="exg">
+      <div class="ex" onclick="setEx()"><div class="ex-l">Exemple</div><div class="ex-v">Infantil 1a S13 Gr.12 &middot; 25-26</div></div>
+      <div class="ex" onclick="window.open('https://www.fcf.cat/competicio','_blank')"><div class="ex-l">Com trobar la URL</div><div class="ex-v">fcf.cat &#x2192; Competicions</div></div>
+    </div>
+    <p style="font-size:10px;color:var(--text3);margin-top:10px;line-height:1.6">
+      Format: <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px">fcf.cat/classificacio/{temporada}/{esport}/{competicio}/{grup}</code>
+    </p>
+  </div>
+</div>
+
+<div class="prog hidden" id="progWrap">
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-lbl"><span class="dot"></span><span id="progTxt">Iniciant&#x2026;</span></div>
+</div>
+<div class="err hidden" id="errWrap"><div class="err-inner" id="errTxt"></div></div>
+<div class="dash hidden" id="dash"></div>
+
+<script>
+var SB_URL = 'https://msbfqqvquxvieyiyqlen.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zYmZxcXZxdXh2aWV5aXlxbGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwOTAzMjcsImV4cCI6MjA5NDY2NjMyN30.0JzXWIOg-9p_kc4Dhj09fCq2fm8pPQyDrH-qWot-fzE';
+
+function sbReq(path, method, body) {
+  var opts = {method: method || 'GET', headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': body ? 'resolution=merge-duplicates,return=minimal' : 'return=representation'}};
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(SB_URL + path, opts).then(function(r) { if (!r.ok) throw new Error('SB ' + r.status); return r.json(); });
+}
+function sbGetCache(slug, url) {
+  var path = '/rest/v1/team_cache?team_slug=eq.' + encodeURIComponent(slug) + '&classif_url=eq.' + encodeURIComponent(url) + '&expires_at=gt.' + new Date().toISOString() + '&limit=1&select=data,team_name,created_at';
+  return sbReq(path).then(function(rows) { return rows.length ? rows[0] : null; }).catch(function() { return null; });
+}
+function sbSaveCache(slug, url, season, teamName, players) {
+  var exp = new Date(Date.now() + 24*3600*1000).toISOString();
+  sbReq('/rest/v1/team_cache', 'POST', {team_slug: slug, classif_url: url, season: season, team_name: teamName, data: players, expires_at: exp}).catch(function() {});
+}
+function sbSaveHistory(slug, name, url, season, count, src) {
+  sbReq('/rest/v1/search_history', 'POST', {team_slug: slug, team_name: name, classif_url: url, season: season, player_count: count, source: src}).catch(function() {});
+}
+function sbGetHistory() {
+  return sbReq('/rest/v1/search_history?order=searched_at.desc&limit=15&select=team_name,team_slug,classif_url,season,player_count,source,searched_at').catch(function() { return []; });
+}
+function renderHistory(rows) {
+  if (!rows || !rows.length) return;
+  var panel = document.getElementById('historyPanel'), list = document.getElementById('historyList'), cnt = document.getElementById('historyCount');
+  cnt.textContent = rows.length + ' equip' + (rows.length > 1 ? 's' : '');
+  list.innerHTML = '';
+  rows.forEach(function(r) {
+    var d = new Date(r.searched_at);
+    var when = d.toLocaleDateString('ca-ES', {day:'2-digit',month:'2-digit'}) + ' ' + d.toLocaleTimeString('ca-ES', {hour:'2-digit',minute:'2-digit'});
+    var src = r.source === 'cache' ? '&#x26A1;' : '&#x1F504;';
+    var div = document.createElement('div');
+    div.className = 'hitem';
+    div.innerHTML = '<span style="flex:1;font-size:12px;font-weight:500">' + (r.team_name || r.team_slug) + '</span><span style="font-size:10px;color:var(--text3)">' + (r.season || '') + '</span><span style="font-size:10px;color:var(--text3);margin-left:6px">' + src + ' ' + when + '</span>';
+    (function(ru, rs) { div.onclick = function() { historyLoad(ru, rs); }; })(r.classif_url, r.team_slug);
+    list.appendChild(div);
+  });
+  panel.classList.remove('hidden');
+}
+function historyLoad(url, slug) {
+  document.getElementById('urlInput').value = url;
+  onFetch().then(function() {
+    var sel = document.getElementById('teamSel');
+    for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].value === slug) { sel.selectedIndex = i; break; } }
+    onGen();
+  });
+}
+
+var PROXIES = [
+  function(u) { return '/api/proxy?url=' + encodeURIComponent(u); },
+  function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
+  function(u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+  function(u) { return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
+  function(u) { return 'https://cors.eu.org/' + u; }
+];
+function xhrGet(url) {
+  return new Promise(function(resolve, reject) {
+    var x = new XMLHttpRequest(); x.open('GET', url);
+    x.timeout = 15000;
+    x.onload = function() { x.status >= 200 && x.status < 300 ? resolve(x.responseText) : reject(new Error('HTTP ' + x.status)); };
+    x.onerror = function() { reject(new Error('network')); };
+    x.ontimeout = function() { reject(new Error('timeout')); };
+    x.send();
+  });
+}
+// Own Vercel proxy first (fast, no rate limits); public proxies as parallel fallback
+function pFetch(url) {
+  return new Promise(function(resolve, reject) {
+    var settled = false, ownDone = false, ownTimer;
+    function tryProxy(makeProxy) {
+      return xhrGet(makeProxy(url)).then(function(t) {
+        if (t.length < 200 || t.slice(0,10) === '{"error"') throw new Error('bad');
+        return t;
+      });
+    }
+    tryProxy(PROXIES[0]).then(function(t) {
+      ownDone = true; clearTimeout(ownTimer);
+      if (!settled) { settled = true; resolve(t); }
+    }).catch(function() {
+      ownDone = true; if (!settled) { launchFallbacks(); }
+    });
+    ownTimer = setTimeout(function() { if (!ownDone && !settled) { launchFallbacks(); } }, 3000);
+    function launchFallbacks() {
+      var pending = PROXIES.length - 1, errs = [];
+      PROXIES.slice(1).forEach(function(makeProxy) {
+        tryProxy(makeProxy).then(function(t) {
+          if (!settled) { settled = true; resolve(t); }
+        }).catch(function(e) {
+          errs.push(e.message); pending--;
+          if (pending === 0 && !settled)
+            reject(new Error("No s'ha pogut llegir: " + url + '\n(' + errs.join(' | ') + ')'));
+        });
+      });
+    }
+  });
+}
+function pFetchAll(urls) {
+  return Promise.all(urls.map(function(url) {
+    return pFetch(url).then(function(html) { return {url:url,html:html,ok:true}; }).catch(function() { return {url:url,html:null,ok:false}; });
+  }));
+}
+
+function setP(n, msg) { document.getElementById('progFill').style.width = n + '%'; document.getElementById('progTxt').textContent = msg; }
+function showErr(msg) { document.getElementById('errTxt').textContent = msg; document.getElementById('errWrap').classList.remove('hidden'); }
+function tc(s) { return s.toLowerCase().replace(/(?:^|[\s,\-])[a-záàéèíïóòúüçñ]/g, function(c) { return c.toUpperCase(); }); }
+function setEx() { document.getElementById('urlInput').value = 'https://www.fcf.cat/classificacio/2526/futbol-11/infantil-primera-divisio-s13/grup-12'; }
+function doForceRefresh() { _forceRefresh = true; document.getElementById('genBtn').click(); }
+
+var _cHtml = null, _cUrl = null, _forceRefresh = false;
+
+function onFetch() {
+  var raw = document.getElementById('urlInput').value.trim();
+  if (!raw) return Promise.resolve();
+  document.getElementById('errWrap').classList.add('hidden');
+  document.getElementById('dash').classList.add('hidden');
+  document.getElementById('selWrap').classList.add('hidden');
+  document.getElementById('cacheBadge').classList.add('hidden');
+  document.getElementById('progWrap').classList.remove('hidden');
+  document.getElementById('fetchBtn').disabled = true;
+  setP(5, 'Llegint classificació…');
+  if (!raw.includes('fcf.cat')) {
+    document.getElementById('progWrap').classList.add('hidden'); document.getElementById('fetchBtn').disabled = false;
+    showErr('La URL ha de ser de fcf.cat'); return Promise.resolve();
+  }
+  if (raw.includes('/equip/') || raw.includes('/acta/')) {
+    document.getElementById('progWrap').classList.add('hidden'); document.getElementById('fetchBtn').disabled = false;
+    showErr('Enganxa la URL de la CLASSIFICACIÓ.\nEx: https://www.fcf.cat/classificacio/2526/futbol-11/infantil-primera-divisio-s13/grup-12\nTrobada a: fcf.cat \u2192 Competicions \u2192 Classificació');
+    return Promise.resolve();
+  }
+  return pFetch(raw).then(function(html) {
+    _cHtml = html; _cUrl = raw;
+    setP(20, 'Detectant equips…');
+    var tMap = {}, re = /href="https?:\/\/www\.fcf\.cat\/equip\/\d+\/[^\/]+\/([^"\/]+)"/gi, m;
+    while ((m = re.exec(html)) !== null) { if (!tMap[m[1]]) tMap[m[1]] = tc(m[1].replace(/-/g,' ')); }
+    var teams = Object.keys(tMap).map(function(s) { return [s, tMap[s]]; });
+    teams.sort(function(a,b) { return a[1].localeCompare(b[1]); });
+    if (!teams.length) throw new Error("No s'han trobat equips. Comprova que la URL és una pàgina de classificació de fcf.cat.");
+    var sel = document.getElementById('teamSel');
+    sel.innerHTML = teams.map(function(t) { return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join('');
+    document.getElementById('progWrap').classList.add('hidden');
+    document.getElementById('fetchBtn').disabled = false;
+    document.getElementById('selWrap').classList.remove('hidden');
+  }).catch(function(e) {
+    document.getElementById('progWrap').classList.add('hidden'); document.getElementById('fetchBtn').disabled = false; showErr(e.message);
+  });
+}
+
+function onGen() {
+  var slug = document.getElementById('teamSel').value;
+  if (!slug) return;
+  document.getElementById('errWrap').classList.add('hidden');
+  document.getElementById('dash').classList.add('hidden');
+  document.getElementById('cacheBadge').classList.add('hidden');
+  document.getElementById('progWrap').classList.remove('hidden');
+  document.getElementById('fetchBtn').disabled = true; document.getElementById('genBtn').disabled = true;
+  buildDash(slug, _cHtml, _cUrl).catch(function(e) { showErr(e.message); }).then(function() {
+    document.getElementById('progWrap').classList.add('hidden'); document.getElementById('fetchBtn').disabled = false; document.getElementById('genBtn').disabled = false;
+  });
+}
+
+function parseActa(html, teamSlug, actaUrl) {
+  var parts = (actaUrl.split('/acta/')[1] || '').split('/');
+  var idx = (parts[7] === teamSlug) ? 1 : 0;
+  var titPos = [], supPos = [], re, m;
+  re = /<th[^>]*>Titulars<\/th>/gi; while ((m = re.exec(html)) !== null) titPos.push(m.index);
+  re = /<th[^>]*>Suplents<\/th>/gi; while ((m = re.exec(html)) !== null) supPos.push(m.index);
+  if (titPos.length < 2 || supPos.length < 2) return null;
+  var players = {};
+  function extractSection(hdrIdx) {
+    var ts = html.lastIndexOf('<table', hdrIdx), te = html.indexOf('</table>', hdrIdx) + 8;
+    if (ts < 0 || te < 8) return;
+    var sec = html.slice(ts, te), r2 = /href="(https?:\/\/www\.fcf\.cat\/jugador\/[^"]+)"[^>]*>\s*([^<]{3,60}?)\s*<\/a>/gi, m2;
+    while ((m2 = r2.exec(sec)) !== null) { var u = m2[1].trim(), n = m2[2].trim(); if (n && /[A-ZÁÀÉÈÍÏÓÒÚÜÇÑ]/.test(n[0])) players[u] = n; }
+  }
+  extractSection(titPos[idx]); extractSection(supPos[idx]);
+  var cards = {}, tgPos = [];
+  re = /<th[^>]*>Targetes<\/th>/gi; while ((m = re.exec(html)) !== null) tgPos.push(m.index);
+  if (tgPos.length > 0) {
+    var hdrPos = tgPos.length >= 2 ? tgPos[idx] : tgPos[0];
+    var ts2 = html.lastIndexOf('<table', hdrPos), te2 = html.indexOf('</table>', hdrPos) + 8;
+    if (ts2 >= 0 && te2 >= 8) {
+      var sec2 = html.slice(ts2, te2), mc = {}, rowRe = /<tr>([\s\S]*?)<\/tr>/gi, rowM;
+      while ((rowM = rowRe.exec(sec2)) !== null) {
+        var r3 = rowM[1], um = r3.match(/href="(https?:\/\/www\.fcf\.cat\/jugador\/[^"]+)"/i);
+        if (!um) continue;
+        var url = um[1].trim(); if (!players[url]) continue;
+        if (!mc[url]) mc[url] = {g:0,v:0};
+        if (r3.indexOf('groga-s') !== -1) mc[url].g++; else if (r3.indexOf('vermella-s') !== -1) mc[url].v++;
+      }
+      Object.keys(mc).forEach(function(u) { cards[u] = {groga:mc[u].g, vermella:mc[u].v, dg:mc[u].g >= 2 ? 1 : 0}; });
+    }
+  }
+  return {players:players, cards:cards};
+}
+
+function parsePlayerPage(html, url, rawName) {
+  var bars = {}, re = /class="bar[^"]*"[^>]*>[\s\S]*?<div class="percent">(\d+)<\/div>[\s\S]*?<div class="skill">([^<]+)<\/div>/gi, m;
+  while ((m = re.exec(html)) !== null) bars[m[2].trim().toLowerCase()] = parseInt(m[1]);
+  var gols = 0, gi = html.indexOf('<th>gols</th>');
+  if (gi > -1) { var gm = html.substring(gi, gi+700).match(/class="comptador"[^>]*>(\d+)/); if (gm) gols = parseInt(gm[1]); }
+  var tm = html.match(/<title[^>]*>FCF\s*\|\s*([^<]+)<\/title>/i), titleText = tm ? tm[1].trim() : '';
+  var name = titleText ? tc(titleText) : tc(rawName.replace(/\s+,/g,','));
+  var conv=bars['convocat']||0, tit=bars['titular']||0, sup=bars['suplent']||0, pj=bars['jugats']||tit;
+  var gpp = (pj > 0 && gols > 0) ? parseFloat((gols/pj).toFixed(2)) : 0;
+  return {url:url, name:name, conv:conv, tit:tit, sup:sup, pj:pj, gols:gols, gpp:gpp};
+}
+
+function parseTeamRow(html, slug) {
+  var slugEsc = slug.replace(/-/g,'[-]'), re = new RegExp('/equip/[^"]*/' + slugEsc + '"','i');
+  var rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi, rowM;
+  while ((rowM = rowRe.exec(html)) !== null) {
+    var r = rowM[1]; if (!re.test(r)) continue;
+    var nameM = r.match(/class="tl resumida"[^>]*>\s*<a[^>]*>([^<]+)<\/a>/);
+    if (!nameM) continue;
+    var logoM = r.match(/src="(https?:\/\/files\.fcf\.cat\/escudos\/[^"]+)"/);
+    var posM = r.match(/class="ascens"[^>]*><\/span>(\d+)/), ptsM = r.match(/<td class="tc">(\d+)<\/td>/);
+    var nums=[], nm, nr=/<td class="tc resumida">(\d+)<\/td>/g;
+    while ((nm=nr.exec(r)) !== null) nums.push(parseInt(nm[1]));
+    return {name:nameM[1].trim(), logo:logoM?logoM[1]:null, pos:posM?parseInt(posM[1]):0, pts:ptsM?parseInt(ptsM[1]):0, pj:nums[0]||0, v:nums[1]||0, e:nums[2]||0, d:nums[3]||0};
+  }
+  return {name:tc(slug.replace(/-/g,' ')), logo:null, pos:0, pts:0, pj:0, v:0, e:0, d:0};
+}
+
+function buildDash(slug, cHtml, cUrl) {
+  var t0 = Date.now(), urlM = cUrl.match(/classificacio\/(\d+)\/([^\/]+)\/([^\/]+)\/([^\/\?#]+)/);
+  var season=urlM?urlM[1]:'2526', sport=urlM?urlM[2]:'', comp=urlM?urlM[3]:'', group=urlM?urlM[4]:'';
+  var seasonStr = season.length===4 ? '20'+season.slice(0,2)+'-20'+season.slice(2) : season;
+  var cacheCheck = _forceRefresh ? Promise.resolve(null) : sbGetCache(slug, cUrl);
+  _forceRefresh = false;
+  return cacheCheck.then(function(cached) {
+    if (cached && cached.data && cached.data.length) {
+      setP(100, 'Carregat des de caché ⚡');
+      document.getElementById('cacheBadge').classList.remove('hidden');
+      var ti = parseTeamRow(cHtml, slug);
+      renderDash({players:cached.data, classif:ti, seasonStr:seasonStr, sport:sport, comp:comp, group:group});
+      sbSaveHistory(slug, cached.team_name||ti.name, cUrl, season, cached.data.length, 'cache');
+      return;
+    }
+    setP(8, 'Obtenint calendari…');
+    var calUrl = 'https://www.fcf.cat/calendari-equip/' + season + '/' + sport + '/' + comp + '/' + group + '/' + slug;
+    return pFetch(calUrl).catch(function() { return ''; }).then(function(calHtml) {
+      var acteSet = {}, re = /href="(https?:\/\/www\.fcf\.cat\/acta\/[^"]+)"/gi, m, src = calHtml || '';
+      while ((m = re.exec(src)) !== null) acteSet[m[1]] = 1;
+      if (!Object.keys(acteSet).length) {
+        var sr = slug.replace(/-/g,'[-]'), re2 = new RegExp('href="(https?://www\\.fcf\\.cat/acta/[^"]*' + sr + '[^"]*)"','gi');
+        while ((m = re2.exec(cHtml)) !== null) acteSet[m[1]] = 1;
+      }
+      var acteLinks = Object.keys(acteSet);
+      if (!acteLinks.length) throw new Error('No s\'han trobat partits per a "' + slug + '".');
+      setP(15, acteLinks.length + ' partits. Carregant en paral·lel…');
+      return pFetchAll(acteLinks).then(function(actaResults) {
+        setP(55, 'Actes llegides. Carregant jugadors…');
+        var playerMap = {}, cardTotals = {};
+        actaResults.forEach(function(res) {
+          if (!res.ok || !res.html) return;
+          var parsed = parseActa(res.html, slug, res.url);
+          if (!parsed) return;
+          Object.keys(parsed.players).forEach(function(u) { if (!playerMap[u]) playerMap[u] = parsed.players[u]; });
+          Object.keys(parsed.cards).forEach(function(u) {
+            if (!cardTotals[u]) cardTotals[u] = {groga:0,vermella:0,dg:0};
+            cardTotals[u].groga += parsed.cards[u].groga; cardTotals[u].vermella += parsed.cards[u].vermella; cardTotals[u].dg += parsed.cards[u].dg;
+          });
+        });
+        var playerUrls = Object.keys(playerMap);
+        if (!playerUrls.length) throw new Error("No s'han pogut llegir jugadors. Comprova la connexió.");
+        setP(60, playerUrls.length + ' jugadors. Carregant estadístiques…');
+        return pFetchAll(playerUrls).then(function(playerResults) {
+          setP(95, 'Processant dades…');
+          var players = [];
+          playerResults.forEach(function(res) {
+            var rawName = playerMap[res.url] || '', cards = cardTotals[res.url] || {groga:0,vermella:0,dg:0};
+            if (res.ok && res.html) { var p = parsePlayerPage(res.html, res.url, rawName); p.groga=cards.groga; p.vermella=cards.vermella; p.dg=cards.dg; players.push(p); }
+            else players.push({url:res.url, name:tc(rawName), conv:0, tit:0, sup:0, pj:0, gols:0, gpp:0, groga:cards.groga, vermella:cards.vermella, dg:cards.dg});
+          });
+          var elapsed = ((Date.now()-t0)/1000).toFixed(1);
+          setP(100, 'Fet en ' + elapsed + 's!');
+          var teamInfo = parseTeamRow(cHtml, slug);
+          renderDash({players:players, classif:teamInfo, seasonStr:seasonStr, sport:sport, comp:comp, group:group});
+          sbSaveCache(slug, cUrl, season, teamInfo.name, players);
+          sbSaveHistory(slug, teamInfo.name, cUrl, season, players.length, 'live');
+        });
+      });
+    });
+  });
+}
+
+function renderDash(opts) {
+  var players=opts.players, classif=opts.classif, seasonStr=opts.seasonStr, sport=opts.sport, comp=opts.comp, group=opts.group;
+  players.sort(function(a,b) { return b.tit-a.tit||b.conv-a.conv; });
+  var tGols=players.reduce(function(s,p){return s+p.gols;},0), tGrg=players.reduce(function(s,p){return s+p.groga;},0);
+  var tVrm=players.reduce(function(s,p){return s+p.vermella;},0), tDG=players.reduce(function(s,p){return s+p.dg;},0);
+  var maxPJ=classif.pj||Math.max.apply(null,players.map(function(p){return p.conv;}).concat([1]));
+  var top=players.reduce(function(b,p){return p.gols>b.gols?p:b;},players[0]||{gols:0,name:'—'});
+  var gpp=maxPJ>0?(tGols/maxPJ).toFixed(2).replace(/\.?0+$/,'')||'0':'0';
+  var cDisp=[sport,comp,group].join(' · ').replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+  var now=new Date().toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var rows=players.map(function(p) {
+    var isTop=p.gols>0&&p.gols===top.gols;
+    var nn=isTop?'<strong>'+p.name+' <span class="star">&#x2605;</span></strong>':p.name;
+    var tc_=p.tit>0?'<span class="b bb">'+p.tit+'</span>':'<span class="mu">0</span>';
+    var gc=p.gols>0?'<span class="b bg">'+p.gols+'</span>':'<span class="mu">0</span>';
+    var gpc=(p.pj>0&&p.gols>0)?'<span style="font-weight:600">'+p.gpp+'</span>':'<span class="mu">0</span>';
+    var yc=p.groga>0?'<span class="b ba">'+p.groga+'</span>':'<span class="mu">0</span>';
+    var rc=p.vermella>0?'<span class="b br">'+p.vermella+'</span>':'<span class="mu">0</span>';
+    var dc=p.dg>0?'<span class="b bdg">'+p.dg+'</span>':'<span class="mu">0</span>';
+    return '<tr><td class="nm">'+nn+'</td><td>'+p.conv+'</td><td class="ct">'+tc_+'</td><td>'+p.sup+'</td><td>'+p.pj+'</td><td>'+gc+'</td><td>'+gpc+'</td><td class="cy">'+yc+'</td><td class="cr">'+rc+'</td><td class="cp">'+dc+'</td><td><a class="fl" href="'+p.url+'" target="_blank">&#x2197;</a></td></tr>';
+  }).join('');
+  var logoHtml=classif.logo?'<img class="t-logo" src="'+classif.logo+'" alt="" onerror="this.style.display=\'none\'">':'<div class="t-logo-ph">&#x26BD;</div>';
+  var recHtml=classif.pj>0?'<div class="t-rec"><div class="t-rec-r">'+classif.pos+'è · '+classif.pts+'pts</div><div class="t-rec-d">'+classif.v+'V · '+classif.e+'E · '+classif.d+'D</div></div>':'';
+  document.getElementById('dash').innerHTML='<div class="t-hdr">'+logoHtml+'<div style="flex:1"><div class="t-name">'+classif.name+'</div><div class="t-sub">'+cDisp+' · Temporada '+seasonStr+' · Dades a '+now+' · Font: fcf.cat</div></div>'+recHtml+'</div>'
+    +'<div class="kpis"><div class="kpi"><div class="kl">Jugadors</div><div class="kv">'+players.length+'</div><div class="ks">plantilla</div></div>'
+    +'<div class="kpi"><div class="kl">Partits</div><div class="kv">'+maxPJ+'</div><div class="ks">temporada</div></div>'
+    +'<div class="kpi"><div class="kl">Gols equip</div><div class="kv">'+tGols+'</div><div class="ks">'+gpp+' G/P</div></div>'
+    +'<div class="kpi"><div class="kl">Grogues</div><div class="kv">'+tGrg+'</div><div class="ks">acumulades</div></div>'
+    +'<div class="kpi"><div class="kl">Vermelles</div><div class="kv">'+tVrm+'</div><div class="ks">directes</div></div>'
+    +'<div class="kpi"><div class="kl">Top golejador</div><div class="kv">'+top.gols+'</div><div class="ks">'+(top.name?top.name.split(',')[0]:'—')+'</div></div></div>'
+    +'<div class="exp-row"><button class="btn-sm" onclick="window.print()">&#x1F5A8; Imprimir / PDF</button><button class="btn-sm" onclick="doCSV()">&#x1F4CB; Copiar CSV</button></div>'
+    +'<div class="tw"><table><thead><tr><th class="nl" style="min-width:170px">Jugador</th><th title="Convocats">Conv.</th><th class="ct" title="Titular">Tit.</th><th title="Suplent">Sup.</th><th title="Partits jugats">PJ</th><th>Gols</th><th title="Gols per partit">G/P</th><th class="cy" title="Grogues">&#x1F7E1; Grg.</th><th class="cr" title="Vermelles">&#x1F534; Verm.</th><th class="cp" title="Doble groga">2G</th><th style="width:32px">FCF</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody><tfoot><tr><td class="nm">TOTALS EQUIP</td><td colspan="4" style="font-size:10px;color:var(--text3)">—</td><td><span class="b bg">'+tGols+'</span></td><td style="font-weight:700">'+gpp+'</td><td class="cy"><span class="b ba">'+tGrg+'</span></td><td class="cr"><span class="b br">'+tVrm+'</span></td><td class="cp"><span class="b bdg">'+tDG+'</span></td><td></td></tr></tfoot></table></div>'
+    +'<div class="nota"><strong>Fonts:</strong> Conv./Tit./Sup./PJ/Gols/G·P = fitxes individuals fcf.cat · Grogues/Vermelles/2G = recompte de les actes oficials fcf.cat.<br><strong>&#x2605;</strong> màxim golejador · G/P equip = '+tGols+'÷'+maxPJ+' = <strong>'+gpp+'</strong> · <strong>2G</strong> = doble groga al mateix partit</div>';
+  document.getElementById('dash').classList.remove('hidden');
+  document.getElementById('dash').scrollIntoView({behavior:'smooth'});
+  window._dp = players;
+}
+
+function doCSV() {
+  if (!window._dp) return;
+  var h = 'Jugador,Conv,Tit,Sup,PJ,Gols,G/P,Grogues,Vermelles,2G';
+  var r = window._dp.map(function(p) { return [p.name,p.conv,p.tit,p.sup,p.pj,p.gols,p.gpp,p.groga,p.vermella,p.dg].join(','); });
+  navigator.clipboard.writeText([h].concat(r).join('\n')).then(function(){alert('CSV copiat!');}).catch(function(){alert('Usa Imprimir.');});
+}
+
+sbGetHistory().then(renderHistory);
+</script>
+</body>
+</html>
