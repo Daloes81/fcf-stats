@@ -100,10 +100,11 @@ a.fl:hover{opacity:1}
   <p>Enganxa la URL de la pàgina de <strong>classificació</strong> de fcf.cat, selecciona l'equip i genera el dashboard.</p>
 
   <div id="historyPanel" class="hidden" style="margin-bottom:16px">
-    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;justify-content:space-between">
-      <span>&#x1F553; Cerques recents</span><span id="historyCount"></span>
-    </div>
-    <div id="historyList" style="display:flex;flex-direction:column;gap:4px"></div>
+    <button id="historyToggle" onclick="toggleHistory()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 14px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s">
+      <span style="display:flex;align-items:center;gap:7px"><span style="font-size:13px">&#x1F553;</span> Cerques recents <span id="historyCount" style="background:var(--bg3);border-radius:20px;padding:1px 7px;font-size:10px;color:var(--text3)"></span></span>
+      <span id="historyArrow" style="font-size:10px;transition:transform .2s;display:inline-block">&#x25BC;</span>
+    </button>
+    <div id="historyList" class="hidden" style="display:flex;flex-direction:column;gap:4px;margin-top:6px"></div>
   </div>
 
   <div class="card">
@@ -165,9 +166,27 @@ function sbSaveHistory(slug, name, url, season, count, src) {
 function sbGetHistory() {
   return sbReq('/rest/v1/search_history?order=searched_at.desc&limit=15&select=team_name,team_slug,classif_url,season,player_count,source,searched_at').catch(function() { return []; });
 }
+var _historyOpen = false;
+function toggleHistory() {
+  _historyOpen = !_historyOpen;
+  var list = document.getElementById('historyList');
+  var arrow = document.getElementById('historyArrow');
+  var btn = document.getElementById('historyToggle');
+  if (_historyOpen) {
+    list.classList.remove('hidden');
+    arrow.style.transform = 'rotate(180deg)';
+    btn.style.borderColor = 'var(--accent)';
+  } else {
+    list.classList.add('hidden');
+    arrow.style.transform = 'rotate(0deg)';
+    btn.style.borderColor = 'var(--border)';
+  }
+}
 function renderHistory(rows) {
   if (!rows || !rows.length) return;
-  var panel = document.getElementById('historyPanel'), list = document.getElementById('historyList'), cnt = document.getElementById('historyCount');
+  var panel = document.getElementById('historyPanel');
+  var list = document.getElementById('historyList');
+  var cnt = document.getElementById('historyCount');
   cnt.textContent = rows.length + ' equip' + (rows.length > 1 ? 's' : '');
   list.innerHTML = '';
   rows.forEach(function(r) {
